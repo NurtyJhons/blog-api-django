@@ -13,7 +13,8 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     tags = models.ManyToManyField('Tag', related_name='posts', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)  # ← campo novo
+    updated_at = models.DateTimeField(auto_now=True)
+    image = models.ImageField(upload_to='post_images/', null=True, blank=True)  
 
     class Meta:
         ordering = ['-created_at']  # ← ordenação padrão
@@ -40,3 +41,14 @@ class Like(models.Model):
 
     def __str__(self):
         return f"{self.user} curtiu '{self.post.title}'"
+    
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='favorited_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'post')
+
+    def __str__(self):
+        return f"{self.user} favoritou {self.post}"
